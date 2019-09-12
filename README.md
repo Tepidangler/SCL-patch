@@ -10,6 +10,7 @@ A patch for the args.c file in the scl binary source
 ## Steps
 
 1. Create a temporary working space in the /tmp directory and change to that directory
+
  `$ mkdir /tmp/scl-patch && cd /tmp/scl-patch`
 
 2. Clone scl-utils repo from github
