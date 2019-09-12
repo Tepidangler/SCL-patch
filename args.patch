@@ -1,0 +1,68 @@
+--- ../exploits/scl/code/backups/args.c	2019-04-05 08:48:55.603244791 -0400
++++ ../exploits/scl/code/sclsrc/scl-utils/src/args.c	2019-04-01 15:24:56.602965482 -0400
+@@ -1,3 +1,4 @@
++#include <grp.h> //setgroup()
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdbool.h>
+@@ -79,6 +80,46 @@
+     return EOK;
+ }
+ 
++void drop_privs(void) 
++{
++
++        gid_t gid;
++        uid_t uid;
++
++/* Declaring constants for vars which we'll pass through secure_gentenv() which will grab our sudoer uid and gid to prevent privilege escalation or sudo abuse*/
++        const char *sudo_gid = getenv("SUDO_GID");
++        const char *sudo_uid = getenv("SUDO_UID");       
++
++        if (sudo_uid != NULL) {                    
++
++                 //casting some variables
++                 gid = (gid_t) strtoll(sudo_gid, NULL, 10);
++                 uid = (uid_t) strtoll(sudo_uid, NULL, 10);
++           
++                 //We'll be removing supplemental groups here to ensure user will not escalate privileges
++
++                 setgroups(0, NULL);
++
++
++                 // Setting the group ID and user ID
++                 if (gid == 0) {
++                         puts("Error! Could not drop root group!");
++                         puts("Were you already root?");
++                         exit(2);
++                  } else if (setgid(gid) == -1) {
++                         printf("ERROR: Invalid group ID: %d\n", gid);
++                         exit(2);
++                 }
++
++                 // Dropping all privs
++
++                 if (setuid(uid) == -1) {
++                         printf("ERROR: Invalid User ID: %d\n", uid);
++                         exit(2);
++                 }
++        }
++}
++
+ static int extract_collections(int argc, char **argv, struct scl_args *args)
+ {
+     int i;
+@@ -352,7 +393,7 @@
+             ret = EINPUT;
+             goto fail;
+         }
+-
++        drop_privs();
+         ret = parse_run_args(argc, argv, args);
+         if (ret != EOK) {
+             goto fail;
+@@ -403,3 +444,4 @@
+     free(shebang_argv);
+     return ret;
+ }
++
