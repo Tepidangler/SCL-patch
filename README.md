@@ -1,13 +1,13 @@
 # SCL-patch
 A patch for the args.c file in the scl binary source
 
-#Applying the patch
+# Applying the patch
 
 * If you already have scl compiled on your host you can delete the binary using 
 
 `# rm -rf path/to/scl/binary`
 
-##Steps
+## Steps
 
 1. Create a temporary working space in the /tmp directory and change to that directory
  `$ mkdir /tmp/scl-patch && cd /tmp/scl-patch`
